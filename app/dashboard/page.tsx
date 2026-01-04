@@ -4,6 +4,14 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useStore } from '@/lib/store';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -31,6 +39,8 @@ export default function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { user, logout } = useAuthStore();
   const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const fetchEvents = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}event`);
@@ -216,7 +226,13 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                   <CardFooter className="gap-2">
-                    <Button className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                    <Button
+                      className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setIsDialogOpen(true);
+                      }}
+                    >
                       Register Now
                     </Button>
                     <Button variant="outline" size="icon">
@@ -243,6 +259,94 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">{selectedEvent?.title}</DialogTitle>
+            <DialogDescription className="text-base pt-2">
+              {selectedEvent?.description}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedEvent && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/20">
+                    <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Date</p>
+                    <p className="text-muted-foreground">
+                      {format(selectedEvent.date, 'EEEE, MMMM dd, yyyy')}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/20">
+                    <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Time</p>
+                    <p className="text-muted-foreground">
+                      {format(selectedEvent.date, 'hh:mm a')}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/20">
+                    <Users className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Attendance</p>
+                    <p className="text-muted-foreground">
+                      {selectedEvent.attendees.length} / {selectedEvent.capacity} attendees
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/20">
+                    <Avatar className="h-6 w-6 border">
+                      <AvatarFallback className="text-xs bg-gradient-to-br from-blue-500 to-cyan-500 text-white">
+                        {selectedEvent.organizer.username.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div>
+                    <p className="font-medium">Organizer</p>
+                    <p className="text-muted-foreground">
+                      {selectedEvent.organizer.username}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+              onClick={() => {
+                // Aquí puedes agregar la lógica para registrar al usuario en el evento
+                console.log('Registering for event:', selectedEvent?.id);
+                setIsDialogOpen(false);
+              }}
+            >
+              Confirm Registration
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
