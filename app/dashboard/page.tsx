@@ -1,33 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { mockEvents } from '@/lib/mock-data';
 import { useStore } from '@/lib/store';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useAuthStore } from '@/store/useAuthStore';
+import { format } from 'date-fns';
 import {
+  Bell,
+  Calendar,
   CalendarDays,
-  Search,
-  Users,
-  MapPin,
   Clock,
   LogOut,
-  Bell,
+  MapPin,
+  Search,
   Settings,
   TrendingUp,
-  Calendar,
+  Users,
 } from 'lucide-react';
-import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { events, setEvents } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const { user } = useAuthStore();
 
   useEffect(() => {
     setEvents(mockEvents);
@@ -72,7 +75,7 @@ export default function DashboardPage() {
             </Button>
             <Avatar className="h-9 w-9 cursor-pointer border-2 border-primary/20">
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white text-sm font-semibold">
-                JD
+                {user?.username.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <Button
@@ -92,7 +95,7 @@ export default function DashboardPage() {
         <div className="space-y-8">
           <div>
             <h2 className="text-3xl font-bold tracking-tight mb-2">
-              Welcome back, John!
+              Welcome back, {user?.username}!
             </h2>
             <p className="text-muted-foreground">
               Discover and join amazing tech events happening around you
