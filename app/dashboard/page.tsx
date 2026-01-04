@@ -26,11 +26,11 @@ import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { events, setEvents } = useStore();
+  const { events, setEvents, setUser } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   useEffect(() => {
     setEvents(mockEvents);
@@ -48,6 +48,17 @@ export default function DashboardPage() {
   ];
 
   const handleLogout = () => {
+    // Limpiar el store de autenticación (token, user, localStorage)
+    logout();
+    
+    // Limpiar el store de la aplicación (eventos, usuario)
+    setEvents([]);
+    setUser(null);
+    
+    // Limpiar cualquier otra cosa en localStorage si es necesario
+    // localStorage.clear(); // ⚠️ Usa esto solo si quieres borrar TODO el localStorage
+    
+    // Redirigir al login
     router.push('/login');
   };
 
