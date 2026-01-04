@@ -5,9 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { mockEvents } from '@/lib/mock-data';
 import { useStore } from '@/lib/store';
 import { useAuthStore } from '@/store/useAuthStore';
+import { Event } from '@/types/event.type';
 import { format } from 'date-fns';
 import {
   Bell,
@@ -26,20 +26,29 @@ import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { events, setEvents, setUser } = useStore();
+  const { setUser } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
   const { user, logout } = useAuthStore();
+  const [events, setEvents] = useState<Event[]>([]);
+
+  const fetchEvents = async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}event`);
+    const data = await response.json() as Event[];
+
+    setEvents(data);
+    
+  };
+
 
   useEffect(() => {
-    setEvents(mockEvents);
-  }, [setEvents]);
+    fetchEvents();
+  }, []);
 
-  const filteredEvents = events.filter((event) =>
+  /*const filteredEvents = events.filter((event) =>
     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     event.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  );*/
 
   const stats = [
     { label: 'Total Events', value: '24', icon: Calendar, color: 'text-blue-500' },
@@ -48,17 +57,7 @@ export default function DashboardPage() {
   ];
 
   const handleLogout = () => {
-    // Limpiar el store de autenticación (token, user, localStorage)
     logout();
-    
-    // Limpiar el store de la aplicación (eventos, usuario)
-    setEvents([]);
-    setUser(null);
-    
-    // Limpiar cualquier otra cosa en localStorage si es necesario
-    // localStorage.clear(); // ⚠️ Usa esto solo si quieres borrar TODO el localStorage
-    
-    // Redirigir al login
     router.push('/login');
   };
 
@@ -167,7 +166,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredEvents.map((event) => (
+              {events.map((event) => (
                 <Card
                   key={event.id}
                   className="border-none shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden group"
@@ -228,7 +227,7 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {filteredEvents.length === 0 && (
+            {/* {filteredEvents.length === 0 && (
               <Card className="border-none shadow-md">
                 <CardContent className="py-16">
                   <div className="text-center">
@@ -240,7 +239,7 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
-            )}
+            )} */}
           </div>
         </div>
       </main>
