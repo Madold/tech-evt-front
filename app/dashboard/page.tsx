@@ -51,9 +51,9 @@ export default function DashboardPage() {
   );*/
 
   const stats = [
-    { label: 'Total Events', value: '24', icon: Calendar, color: 'text-blue-500' },
-    { label: 'Attending', value: '8', icon: Users, color: 'text-emerald-500' },
-    { label: 'Upcoming', value: '12', icon: TrendingUp, color: 'text-amber-500' },
+    { label: 'Total Events', value: events.length, icon: Calendar, color: 'text-blue-500' },
+    { label: 'Attending', value: events.reduce((acc, event) => acc + event.attendees.length, 0), icon: Users, color: 'text-emerald-500' },
+    { label: 'Upcoming', value: events.filter((event) => new Date(event.date) > new Date()).length, icon: TrendingUp, color: 'text-amber-500' },
   ];
 
   const handleLogout = () => {
